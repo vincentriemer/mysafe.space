@@ -1,0 +1,32 @@
+rabbitmq:
+  image: rabbitmq:management
+  hostname: my-rabbit
+  ports:
+    - "15672:15672"
+
+sentimentworker:
+  build: ./sentiment-worker
+  links:
+    - rabbitmq
+
+api:
+  build: ./api
+  environment:
+    - VIRTUAL_HOST=dockerhost
+    - PORT=80
+  ports:
+    - "80"
+  links:
+    - rabbitmq
+
+proxy:
+  image: jwilder/nginx-proxy
+  environment:
+    - CERT_NAME=dockerhost
+  volumes:
+    - "./dev-certs:/etc/nginx/certs"
+    - "/var/run/docker.sock:/tmp/docker.sock:ro"
+  ports:
+    - "80:80"
+    - "443:443"
+

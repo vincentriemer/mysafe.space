@@ -1,0 +1,11 @@
+/**
+ * Place your custom CSS styles here.
+ **/
+
+.stream-item {
+  display: none;
+}
+
+.stoked {
+  display: list-item;
+}

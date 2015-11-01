@@ -1,0 +1,24 @@
+{
+  "name": "sentiment-worker",
+  "version": "0.0.1",
+  "description": "",
+  "main": "bootstrap.js",
+  "scripts": {
+    "start": "node bootstrap.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Vincent Riemer",
+  "license": "MIT",
+  "babel": {
+    "presets": [
+      "es2015"
+    ]
+  },
+  "dependencies": {
+    "babel-core": "^6.0.14",
+    "babel-preset-es2015": "^6.0.14",
+    "child-process-promise": "^1.1.0",
+    "wascally": "^0.2.7",
+    "stanford-corenlp": "^0.3.5"
+  }
+}
