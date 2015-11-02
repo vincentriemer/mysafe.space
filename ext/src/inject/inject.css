@@ -3,9 +3,13 @@
  **/
 
 .stream-item {
-  display: none;
+  opacity: 0.0;
+  /*background-color: red !important;*/
+  /*display: none;*/
 }
 
 .stoked {
-  display: list-item;
+  opacity: 1.0;
+  /*background-color: white !important;*/
+  /*display: list-item;*/
 }

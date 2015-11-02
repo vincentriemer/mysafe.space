@@ -2,6 +2,51 @@ MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
 window.addEventListener ("load", myMain, false);
 
 var localCache = {};
+var timeout = 0;
+var interval = 125;
+
+function calculateSentimentForStreamItem(streamItem) {
+	var content = streamItem.querySelectorAll('p.tweet-text');
+	if (content.length !== 0) {
+		var reveal = true;
+		var count = 0;
+
+		for (var j = 0; j < content.length; j++) {
+			var tweetText = content[j].innerText;
+
+			// remove all urls from tweet
+			tweetText = tweetText.replace(/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig, '');
+
+			fetch('https://dockerhost/', {
+				method: 'post',
+				headers: {
+			    'Accept': 'application/json',
+			    'Content-Type': 'application/json'
+			  },
+				credentials: 'include',
+				body: JSON.stringify({
+					tweet: tweetText,
+				})
+			}).then(function(response) {
+				return response.text();
+			}).then(function(body) {
+				if (body === 'Negative') {
+					reveal = false;
+				}
+
+				if (count !== content.length - 1) {
+					count++;
+				} else {
+					timeout -= interval;
+					localCache[streamItem.dataset.itemId] = reveal;
+					if (reveal) {
+						streamItem.className = streamItem.className + " stoked";
+					}
+				}
+			})
+		}
+	}
+}
 
 function processStreamItem(streamItem) {
 	if (typeof localCache[streamItem.dataset.itemId] !== 'undefined') {
@@ -9,48 +54,10 @@ function processStreamItem(streamItem) {
 			streamItem.className = streamItem.className + " stoked";
 		}
 	} else {
-		var content = streamItem.querySelectorAll('p.tweet-text');
-
-		if (content.length !== 0) {
-			var reveal = true;
-			var count = 0;
-
-			for (var j = 0; j < content.length; j++) {
-				var tweetText = content[j].innerText;
-
-				// remove all urls from tweet
-				// tweetText = tweetText.replace(/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig, '');
-
-				// console.log(tweetText);
-
-				fetch('https://dockerhost/', {
-					method: 'post',
-					headers: {
-				    'Accept': 'application/json',
-				    'Content-Type': 'application/json'
-				  },
-					credentials: 'include',
-					body: JSON.stringify({
-						tweet: tweetText,
-					})
-				}).then(function(response) {
-					return response.text();
-				}).then(function(body) {
-					if (body === 'Negative') {
-						reveal = false;
-					}
-
-					if (count !== content.length - 1) {
-						count++;
-					} else {
-						localCache[streamItem.dataset.itemId] = reveal;
-						if (reveal) {
-							streamItem.className = streamItem.className + " stoked";
-						}
-					}
-				})
-			}
-		}
+		timeout += interval;
+		window.setTimeout(function() {
+			calculateSentimentForStreamItem(streamItem);
+		}, timeout);
 	}
 };
 
