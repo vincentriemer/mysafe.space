@@ -1,0 +1,51 @@
+rabbitmq:
+  image: rabbitmq:management
+  hostname: my-rabbit
+  restart: always
+  tty: true
+  stdin_open: true
+  ports:
+    - "15672:15672"
+  labels:
+    io.rancher.scheduler.affinity:host_label: role=rabbitmq
+
+sentimentworker:
+  build: ./sentiment-worker
+  restart: always
+  tty: true
+  stdin_open: true
+  links:
+    - rabbitmq
+  labels:
+    io.rancher.scheduler.affinity:host_label: role=worker
+    io.rancher.scheduler.global: 'true'
+
+api:
+  build: ./api
+  restart: always
+  tty: true
+  stdin_open: true
+  environment:
+    - PORT=8080
+  ports:
+    - "80"
+  links:
+    - rabbitmq
+  labels:
+    io.rancher.scheduler.affinity:host_label: role=webserver
+
+api-lb:
+  ports:
+    - "443:8080"
+  restart: always
+  labels:
+    io.rancher.loadbalancer.ssl.ports: '443'
+    io.rancher.loadbalancer.target.huginn: huginn.vincentriemer.com:443=3000
+    io.rancher.scheduler.affinity:host_label: role=webserver
+  tty: true
+  image: rancher/load-balancer-service
+  links:
+  - api:api
+  stdin_open: true
+
+

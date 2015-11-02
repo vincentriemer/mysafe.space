@@ -6,7 +6,7 @@ RUN set -ex \
     7937DFD2AB06298B2293C3187D33FF9D0246406D \
     114F43EE0176B71C7BC219DD50A3051F888C628D \
   ; do \
-    gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$key"; \
+    gpg --keyserver hkp://hkps.pool.sks-keyservers.net:80 --recv-keys "$key"; \
   done
 
 ENV NODE_VERSION 0.10.40

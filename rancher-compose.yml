@@ -1,0 +1,8 @@
+rabbitmq:
+  scale: 1
+api:
+  scale: 1
+api-lb:
+  scale: 1
+  loadbalancer_config: {}
+  default_cert: 'dockerhost'

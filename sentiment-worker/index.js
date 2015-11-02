@@ -15,8 +15,6 @@ let nlpConfig = {
 rabbit.handle('calculate_sentiment', message => {
   const tweet = message.body.tweet;
 
-  console.log(`Calculating sentiment for tweet: ${tweet}...`);
-
   coreNLP.process(tweet, (err, result) => {
     if (err) return console.error(err);
 
@@ -30,14 +28,8 @@ rabbit.handle('calculate_sentiment', message => {
         response = 'Negative';
       }
     });
-
-    console.log( `Result: ${response}`);
     message.reply({result: response});
   });
-  // exec(`cd stanford-corenlp-full-2015-04-20 && echo "${tweet}" | java -cp "*" -mx5g edu.stanford.nlp.sentiment.SentimentPipeline -stdin`)
-  //   .then(res => {
-  //     message.reply({ result: res.stdout.trim() });
-  //   });
 });
 
 import topology from './topology';
